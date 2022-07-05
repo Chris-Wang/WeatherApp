@@ -4,11 +4,11 @@ import WeatherCard from '../WeatherCard';
 import { renderBackground } from '../../../utils';
 import { useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { updateWeather } from '../../../weatherSlice';
+import { updateWeather } from '../../../store/weather/weatherSlice';
 import {
   useGetPositionQuery,
   useGetWeatherByPositionQuery,
-} from '../../../apis/weather';
+} from '../../../store/apis/weather';
 
 const cities = [
   { city: 'Sydney', identifier: 'Australia/Sydney' },

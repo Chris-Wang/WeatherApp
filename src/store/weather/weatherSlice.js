@@ -1,6 +1,6 @@
 //weatherSlice.js
 import { createSlice } from '@reduxjs/toolkit';
-import { formatResponse } from './utils';
+import { formatResponse } from '../../utils';
 
 export const weatherSlice = createSlice({
   name: 'weather',
