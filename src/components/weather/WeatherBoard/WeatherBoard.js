@@ -1,46 +1,45 @@
-import "./WeatherBoard.css";
-import React from "react";
-import { connect } from "react-redux";
-import { fetchCityWeather } from "../../../actions";
-import WeatherCard from "../WeatherCard";
-import { renderBackground } from "../../../utils";
+import './WeatherBoard.css';
+import React, { useEffect } from 'react';
+import WeatherCard from '../WeatherCard';
+import { renderBackground } from '../../../utils';
+import { useParams } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { updateWeather } from '../../../weatherSlice';
+import {
+  useGetPositionQuery,
+  useGetWeatherByPositionQuery,
+} from '../../../apis/weather';
 
 const cities = [
-  { city: "Sydney", identifier: "Australia/Sydney" },
-  { city: "Seoul", identifier: "Asia/Seoul" },
-  { city: "London", identifier: "Europe/London" },
-  { city: "New York", identifier: "America/New_York" },
+  { city: 'Sydney', identifier: 'Australia/Sydney' },
+  { city: 'Seoul', identifier: 'Asia/Seoul' },
+  { city: 'London', identifier: 'Europe/London' },
+  { city: 'New York', identifier: 'America/New_York' },
 ];
 
-class WeatherBoard extends React.Component {
-  componentDidMount() {
-    if (!this.props.match.params.name) {
-      this.props.fetchCityWeather("Sydney");
-    } else {
-      this.props.fetchCityWeather(this.props.match.params.name);
-    }
-  }
+const WeatherBoard = (props) => {
+  const { name = 'Sydney' } = useParams();
+  const dispatch = useDispatch();
+  const weather = useSelector((state) => state.weather);
+  const { data: pos, isLoading, isError } = useGetPositionQuery(name);
+  const { data: rawData } = useGetWeatherByPositionQuery(pos);
 
-  render() {
-    const { weather } = this.props;
-    if (!weather) {
-      return null;
-    }
-    return (
-      <div
-        className="weatherBoard"
-        style={renderBackground(weather.main, weather.dayPart)}
-      >
-        <div className="weatherBoard-cover">
-          <WeatherCard cities={cities} />
-        </div>
+  useEffect(() => {
+    if (rawData) dispatch(updateWeather({ city: name, data: rawData }));
+  }, [dispatch, name, rawData]);
+
+  if (!weather) return <>Loading</>;
+
+  return (
+    <div
+      className="weatherBoard"
+      style={renderBackground(weather.main, weather.dayPart)}
+    >
+      <div className="weatherBoard-cover">
+        <WeatherCard cities={cities} />
       </div>
-    );
-  }
-}
-
-const mapStateToProps = (state) => {
-  return { weather: state.weather };
+    </div>
+  );
 };
 
-export default connect(mapStateToProps, { fetchCityWeather })(WeatherBoard);
+export default WeatherBoard;
